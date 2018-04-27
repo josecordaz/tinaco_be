@@ -10,3 +10,15 @@
 ```
     docker rm -f tinaco_be
 ```
+
+```
+    docker tag ID josecordaz/tinaco_be:1.0
+```
+
+```
+    docker tag ID josecordaz/tinaco_be:1.0
+```
+
+```
+    docker push ID
+```

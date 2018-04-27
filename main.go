@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -23,49 +24,23 @@ type Address struct {
 }
 
 type Conn struct {
-	status bool `json:"status,omitempty"`
+	Status bool `json:"status,omitempty"`
+}
+type Level struct {
+	Level int `json:"level,omitempty"`
 }
 
 var people []Person
 
 // Display all from the people var
 func GetConn(w http.ResponseWriter, r *http.Request) {
-	conn := Conn{true}
+	conn := Conn{rand.Intn(2) == 1}
 	json.NewEncoder(w).Encode(conn)
 }
 
-// Display a single data
-func GetPerson(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	for _, item := range people {
-		if item.ID == params["id"] {
-			json.NewEncoder(w).Encode(item)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode(&Person{})
-}
-
-// create a new item
-func CreatePerson(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	var person Person
-	_ = json.NewDecoder(r.Body).Decode(&person)
-	person.ID = params["id"]
-	people = append(people, person)
-	json.NewEncoder(w).Encode(people)
-}
-
-// Delete an item
-func DeletePerson(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	for index, item := range people {
-		if item.ID == params["id"] {
-			people = append(people[:index], people[index+1:]...)
-			break
-		}
-		json.NewEncoder(w).Encode(people)
-	}
+func GetLevel(w http.ResponseWriter, r *http.Request) {
+	level := Level{rand.Intn(100)}
+	json.NewEncoder(w).Encode(level)
 }
 
 // main function to boot up everything
@@ -74,9 +49,7 @@ func main() {
 	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
 	people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Z", State: "State Y"}})
 	router.HandleFunc("/con", GetConn).Methods("GET")
-	router.HandleFunc("/people/{id}", GetPerson).Methods("GET")
-	router.HandleFunc("/people/{id}", CreatePerson).Methods("POST")
-	router.HandleFunc("/people/{id}", DeletePerson).Methods("DELETE")
-	log.Fatal(http.ListenAndServe(":8000", router))
+	router.HandleFunc("/level", GetLevel).Methods("GET")
 	fmt.Println("Server ready!!")
+	log.Fatal(http.ListenAndServe(":8000", router))
 }

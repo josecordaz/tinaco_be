@@ -16,16 +16,22 @@ type Person struct {
 	Lastname  string   `json:"lastname,omitempty"`
 	Address   *Address `json:"address,omitempty"`
 }
+
 type Address struct {
 	City  string `json:"city,omitempty"`
 	State string `json:"state,omitempty"`
 }
 
+type Conn struct {
+	status bool `json:"status,omitempty"`
+}
+
 var people []Person
 
 // Display all from the people var
-func GetPeople(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(people)
+func GetConn(w http.ResponseWriter, r *http.Request) {
+	conn := Conn{true}
+	json.NewEncoder(w).Encode(conn)
 }
 
 // Display a single data
@@ -67,7 +73,7 @@ func main() {
 	router := mux.NewRouter()
 	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
 	people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Z", State: "State Y"}})
-	router.HandleFunc("/people", GetPeople).Methods("GET")
+	router.HandleFunc("/con", GetConn).Methods("GET")
 	router.HandleFunc("/people/{id}", GetPerson).Methods("GET")
 	router.HandleFunc("/people/{id}", CreatePerson).Methods("POST")
 	router.HandleFunc("/people/{id}", DeletePerson).Methods("DELETE")

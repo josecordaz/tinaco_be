@@ -20,5 +20,5 @@
 ```
 
 ```bash
-    docker push ID
+    docker run -d -p 8000:8000 --name tinaco_be josecordaz/tinaco_be:1.0
 ```

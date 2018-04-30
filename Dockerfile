@@ -4,6 +4,8 @@ RUN go get github.com/stianeikeland/go-rpio
 
 RUN go get -u github.com/gorilla/mux
 
+RUN go get github.com/gorilla/handlers
+
 COPY main.go /
 
 COPY run.sh /

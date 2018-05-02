@@ -191,7 +191,7 @@ func main() {
 			level := convertToPCT(d)
 			rpio.Close()
 			fmt.Println(time.Now(), "level Readed ", level)
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}()
 

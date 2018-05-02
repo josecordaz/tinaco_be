@@ -88,6 +88,7 @@ func getDistance() float64 {
 	var avg, sum float64
 	for i := 0; i < 10; i++ {
 		ds = append(ds, getMeasurement())
+		time.Sleep(time.Millisecond * 200)
 	}
 
 	bubbleSort(ds)
@@ -190,7 +191,7 @@ func main() {
 			level := convertToPCT(d)
 			rpio.Close()
 			fmt.Println(time.Now(), "level Readed ", level)
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second)
 		}
 	}()
 

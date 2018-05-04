@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	rpio "github.com/stianeikeland/go-rpio"
 )
 
@@ -28,7 +29,10 @@ type Conn struct {
 }
 type Level struct {
 	Level int `json:"level,omitempty"`
+	mu    sync.Mutex
 }
+
+var level Level
 
 func Swap(arrayzor []float64, i, j int) {
 	tmp := arrayzor[j]
@@ -88,7 +92,7 @@ func getDistance() float64 {
 	var avg, sum float64
 	for i := 0; i < 10; i++ {
 		ds = append(ds, getMeasurement())
-		time.Sleep(time.Millisecond * 200)
+		time.Sleep(time.Second)
 	}
 
 	bubbleSort(ds)
@@ -105,8 +109,8 @@ func getDistance() float64 {
 }
 
 func convertToPCT(d float64) int {
-	low := 5.5
-	hight := 22.5
+	low := 20.0
+	hight := 110.0
 
 	if d < low {
 		return 100
@@ -117,24 +121,15 @@ func convertToPCT(d float64) int {
 	rdistance := d - low
 	total := hight - low
 
-	tmp := ((rdistance * 100) / total)
-	fmt.Println("tmp", tmp)
-
 	return int(100 - ((rdistance * 100) / total))
-}
-
-// Display all from the people var
-func GetConn(w http.ResponseWriter, r *http.Request) {
-	conn := Conn{rand.Intn(2) == 1}
-	json.NewEncoder(w).Encode(conn)
 }
 
 func GetLevel(w http.ResponseWriter, r *http.Request) {
 	// d := getDistance()
 	// level := convertToPCT(d)
-	json.NewEncoder(w).Encode(Level{100})
-	cont++
-	fmt.Println(cont, " Level: ", 100)
+	level.mu.Lock()
+	json.NewEncoder(w).Encode(level)
+	level.mu.Unlock()
 }
 
 func GetBombStatus(w http.ResponseWriter, r *http.Request) {
@@ -157,13 +152,13 @@ func TurnBombOff(w http.ResponseWriter, r *http.Request) {
 
 // main function to boot up everything
 func main() {
-	// router := mux.NewRouter()
+	router := mux.NewRouter()
 	// router.HandleFunc("/con", GetConn).Methods("GET")
-	// router.HandleFunc("/level", GetLevel).Methods("GET")
-	// router.HandleFunc("/b_on", TurnBombOn).Methods("GET")
-	// router.HandleFunc("/b_off", TurnBombOff).Methods("GET")
-	// router.HandleFunc("/b_status", GetBombStatus).Methods("GET")
-	// router.Headers("Access-Control-Allow-Origin", "*")
+	router.HandleFunc("/level", GetLevel).Methods("GET")
+	router.HandleFunc("/b_on", TurnBombOn).Methods("GET")
+	router.HandleFunc("/b_off", TurnBombOff).Methods("GET")
+	router.HandleFunc("/b_status", GetBombStatus).Methods("GET")
+	router.Headers("Access-Control-Allow-Origin", "*")
 
 	// Open and map memory to access gpio, check for errors
 
@@ -178,9 +173,6 @@ func main() {
 				os.Exit(1)
 			}
 
-			// Unmap gpio memory when done
-			// defer rpio.Close()
-
 			// Set pin to output mode
 			bombPin.Output()
 
@@ -188,19 +180,21 @@ func main() {
 
 			echoPin.Input()
 			d := getDistance()
-			level := convertToPCT(d)
+			level.mu.Lock()
+			level.Level = convertToPCT(d)
+			level.mu.Unlock()
 			rpio.Close()
-			fmt.Println(time.Now(), "level Readed ", level)
-			time.Sleep(time.Millisecond * 300)
+			fmt.Println(time.Now().Format(time.RFC3339), " level Readed ", level)
+			time.Sleep(time.Second)
 		}
 	}()
 
-	wg.Wait()
+	fmt.Println("Server ready!!")
+	err := http.ListenAndServe(":8000", handlers.CORS()(router))
+	if err != nil {
+		fmt.Println("Error", err)
+	}
 
-	// fmt.Println("Server ready!!")
-	// err := http.ListenAndServe(":8000", handlers.CORS()(router))
-	// if err != nil {
-	// 	fmt.Println("Error", err)
-	// }
+	wg.Wait()
 
 }

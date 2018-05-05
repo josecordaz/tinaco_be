@@ -91,7 +91,7 @@ func getDistance() float64 {
 	var avg, sum float64
 	for i := 0; i < 10; i++ {
 		ds = append(ds, getMeasurement())
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 100)
 	}
 
 	bubbleSort(ds)

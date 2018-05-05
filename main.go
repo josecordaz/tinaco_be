@@ -146,7 +146,7 @@ func TurnBombOn(w http.ResponseWriter, r *http.Request) {
 func TurnBombOff(w http.ResponseWriter, r *http.Request) {
 	bombPin.High()
 	bomba_state = false
-	json.NewEncoder(w).Encode(Conn{true})
+	json.NewEncoder(w).Encode(Conn{false})
 }
 
 // main function to boot up everything

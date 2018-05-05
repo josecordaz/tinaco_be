@@ -29,7 +29,6 @@ type Conn struct {
 }
 type Level struct {
 	Level int `json:"level,omitempty"`
-	mu    sync.Mutex
 }
 
 var level Level
@@ -57,11 +56,11 @@ func getMeasurement() float64 {
 
 	trigPin.Low()
 
-	time.Sleep(time.Millisecond * 100)
+	time.Sleep(time.Millisecond * 200)
 
 	trigPin.High()
 
-	time.Sleep(time.Microsecond * 10)
+	time.Sleep(time.Microsecond * 20)
 
 	trigPin.Low()
 
@@ -125,11 +124,11 @@ func convertToPCT(d float64) int {
 }
 
 func GetLevel(w http.ResponseWriter, r *http.Request) {
-	// d := getDistance()
-	// level := convertToPCT(d)
-	level.mu.Lock()
-	json.NewEncoder(w).Encode(level)
-	level.mu.Unlock()
+	d := getDistance()
+	level := convertToPCT(d)
+	// level.mu.Lock()
+	json.NewEncoder(w).Encode(Level{level})
+	// level.mu.Unlock()
 }
 
 func GetBombStatus(w http.ResponseWriter, r *http.Request) {
@@ -160,34 +159,35 @@ func main() {
 	router.HandleFunc("/b_status", GetBombStatus).Methods("GET")
 	router.Headers("Access-Control-Allow-Origin", "*")
 
+	// Set pin to output mode
+
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	trigPin.Output()
+
+	echoPin.Input()
+	bombPin.Output()
+
 	// Open and map memory to access gpio, check for errors
 
-	var wg sync.WaitGroup
+	// var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for {
-			if err := rpio.Open(); err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
+	// wg.Add(1)
+	// go func() {
+	// 	defer wg.Done()
+	// 	for {
 
-			// Set pin to output mode
-			bombPin.Output()
-
-			trigPin.Output()
-
-			echoPin.Input()
-			d := getDistance()
-			level.mu.Lock()
-			level.Level = convertToPCT(d)
-			level.mu.Unlock()
-			rpio.Close()
-			fmt.Println(time.Now().Format(time.RFC3339), " level Readed ", level)
-			time.Sleep(time.Second)
-		}
-	}()
+	// 		d := getDistance()
+	// 		level.mu.Lock()
+	// 		level.Level = convertToPCT(d)
+	// 		level.mu.Unlock()
+	// 		fmt.Println(time.Now().Format(time.RFC3339), " level Readed ", level)
+	// 		time.Sleep(time.Second)
+	// 	}
+	// }()
 
 	fmt.Println("Server ready!!")
 	err := http.ListenAndServe(":8000", handlers.CORS()(router))
@@ -195,6 +195,8 @@ func main() {
 		fmt.Println("Error", err)
 	}
 
-	wg.Wait()
+	// wg.Wait()
+
+	rpio.Close()
 
 }

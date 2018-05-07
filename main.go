@@ -190,7 +190,7 @@ func main() {
 	// }()
 
 	fmt.Println("Server ready!!")
-	err := http.ListenAndServe("0.0.0.0:80", handlers.CORS()(router))
+	err := http.ListenAndServeTLS("0.0.0.0:443", "certificate.crt", "private.key", handlers.CORS()(router))
 	if err != nil {
 		fmt.Println("Error", err)
 	}

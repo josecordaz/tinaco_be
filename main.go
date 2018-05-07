@@ -190,7 +190,7 @@ func main() {
 	// }()
 
 	fmt.Println("Server ready!!")
-	err := http.ListenAndServe("0.0.0.0:8000", handlers.CORS()(router))
+	err := http.ListenAndServe("0.0.0.0:80", handlers.CORS()(router))
 	if err != nil {
 		fmt.Println("Error", err)
 	}

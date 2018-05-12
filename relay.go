@@ -28,6 +28,7 @@ func main() {
 
 	for i := 0; bombPin.Read() == rpio.High; i++ {
 		fmt.Println("i", i)
+		bombPin.PullDown()
 		bombPin.Low()
 	}
 	fmt.Println("Low")

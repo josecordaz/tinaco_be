@@ -25,5 +25,7 @@ func main() {
 
 	time.Sleep(time.Second * 5)
 
+	bombPin.Low()
+
 	rpio.Close()
 }

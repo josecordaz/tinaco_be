@@ -19,7 +19,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	bombPin.Output()
+	bombPin.Input()
 
 	bombPin.High()
 	fmt.Println("High")

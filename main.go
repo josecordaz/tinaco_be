@@ -214,7 +214,7 @@ func main() {
 	mux.HandleFunc("/level", getlevel)
 	mux.HandleFunc("/b_on", TurnBombOn)
 	mux.HandleFunc("/b_off", TurnBombOff)
-	// router.HandleFunc("/b_status", GetBombStatus).Methods("GET")
+	mux.HandleFunc("/b_status", GetBombStatus)
 	// mux.Headers("Access-Control-Allow-Origin", "*")
 
 	// Set pin to output mode

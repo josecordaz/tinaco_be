@@ -20,12 +20,18 @@ func main() {
 	}
 
 	bombPin.Output()
+	bombPin.Mode(rpio.Output)
 
-	// bombPin.High()
-	bombPin.Toggle()
-	// fmt.Println("High")
+	bombPin.High()
+	// bombPin.Toggle()
+
+	bombPin.High()
+	fmt.Println("High")
 
 	time.Sleep(time.Second * 5)
+
+	bombPin.Low()
+	fmt.Println("Low")
 
 	// for i := 0; bombPin.Read() == rpio.High; i++ {
 	// 	fmt.Println("i", i)

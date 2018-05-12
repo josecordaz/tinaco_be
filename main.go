@@ -7,12 +7,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
+	"sync"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/rs/cors"
-	// rpio "github.com/stianeikeland/go-rpio"
+	rpio "github.com/stianeikeland/go-rpio"
 )
 
 const (
@@ -26,12 +28,12 @@ type JWTData struct {
 	CustomClaims map[string]string `json:"custom,omitempty"`
 }
 
-// var (
-// 	// Use mcu pin 10, corresponds to physical pin 19 on the pi
-// 	bombPin = rpio.Pin(17)
-// 	trigPin = rpio.Pin(23)
-// 	echoPin = rpio.Pin(24)
-// )
+var (
+	// Use mcu pin 10, corresponds to physical pin 19 on the pi
+	bombPin = rpio.Pin(17)
+	trigPin = rpio.Pin(23)
+	echoPin = rpio.Pin(24)
+)
 
 var bomba_state = false
 
@@ -65,60 +67,60 @@ func bubbleSort(arrayzor []float64) {
 	}
 }
 
-// func getMeasurement() float64 {
+func getMeasurement() float64 {
 
-// 	trigPin.Low()
+	trigPin.Low()
 
-// 	time.Sleep(time.Millisecond * 200)
+	time.Sleep(time.Millisecond * 200)
 
-// 	trigPin.High()
+	trigPin.High()
 
-// 	time.Sleep(time.Microsecond * 20)
+	time.Sleep(time.Microsecond * 20)
 
-// 	trigPin.Low()
+	trigPin.Low()
 
-// 	var wg sync.WaitGroup
-// 	var start time.Time
-// 	var d time.Duration
+	var wg sync.WaitGroup
+	var start time.Time
+	var d time.Duration
 
-// 	wg.Add(1)
-// 	go func() {
-// 		for echoPin.Read() == rpio.Low {
-// 		}
-// 		start = time.Now()
-// 		for echoPin.Read() == rpio.High {
-// 		}
-// 		d = time.Since(start)
-// 		wg.Done()
-// 	}()
+	wg.Add(1)
+	go func() {
+		for echoPin.Read() == rpio.Low {
+		}
+		start = time.Now()
+		for echoPin.Read() == rpio.High {
+		}
+		d = time.Since(start)
+		wg.Done()
+	}()
 
-// 	wg.Wait()
+	wg.Wait()
 
-// 	res := d.Seconds() * 17000
+	res := d.Seconds() * 17000
 
-// 	return res
-// }
+	return res
+}
 
-// func getDistance() float64 {
-// 	ds := make([]float64, 0)
-// 	var avg, sum float64
-// 	for i := 0; i < 10; i++ {
-// 		ds = append(ds, getMeasurement())
-// 		time.Sleep(time.Millisecond * 100)
-// 	}
+func getDistance() float64 {
+	ds := make([]float64, 0)
+	var avg, sum float64
+	for i := 0; i < 10; i++ {
+		ds = append(ds, getMeasurement())
+		time.Sleep(time.Millisecond * 100)
+	}
 
-// 	bubbleSort(ds)
+	bubbleSort(ds)
 
-// 	ds = ds[2:7]
+	ds = ds[2:7]
 
-// 	for _, v := range ds {
-// 		sum += v
-// 	}
+	for _, v := range ds {
+		sum += v
+	}
 
-// 	avg = sum / 5
+	avg = sum / 5
 
-// 	return avg
-// }
+	return avg
+}
 
 func convertToPCT(d float64) int {
 	low := 20.0
@@ -138,27 +140,23 @@ func convertToPCT(d float64) int {
 
 func getlevel(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
-	// d := getDistance()
-	// level := convertToPCT(d)
-	// level.mu.Lock()
-	json.NewEncoder(w).Encode(Level{34})
-	// level.mu.Unlock()
+	json.NewEncoder(w).Encode(Level{int(getMeasurement())})
 }
 
 func GetBombStatus(w http.ResponseWriter, r *http.Request) {
-	// conn := Conn{rand.Intn(2) == 1}
 	conn := Conn{bomba_state}
 	json.NewEncoder(w).Encode(conn)
 }
 
 func TurnBombOn(w http.ResponseWriter, r *http.Request) {
-	// bombPin.Low()
+	bombPin.Output()
+	bombPin.High()
 	bomba_state = true
 	json.NewEncoder(w).Encode(Conn{true})
 }
 
 func TurnBombOff(w http.ResponseWriter, r *http.Request) {
-	// bombPin.High()
+	bombPin.Input()
 	bomba_state = false
 	json.NewEncoder(w).Encode(Conn{false})
 }
@@ -211,27 +209,24 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 // main function to boot up everything
 func main() {
-	// router := mux.NewRouter()
 	mux := http.NewServeMux()
-	// router.HandleFunc("/con", GetConn).Methods("GET")
 	mux.HandleFunc("/login", login)
 	mux.HandleFunc("/level", getlevel)
-	// router.HandleFunc("/b_on", TurnBombOn).Methods("GET")
-	// router.HandleFunc("/b_off", TurnBombOff).Methods("GET")
+	mux.HandleFunc("/b_on", TurnBombOn)
+	mux.HandleFunc("/b_off", TurnBombOff)
 	// router.HandleFunc("/b_status", GetBombStatus).Methods("GET")
 	// mux.Headers("Access-Control-Allow-Origin", "*")
 
 	// Set pin to output mode
 
-	// if err := rpio.Open(); err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-	// trigPin.Output()
+	trigPin.Output()
 
-	// echoPin.Input()
-	// bombPin.Output()
+	echoPin.Input()
 
 	// Open and map memory to access gpio, check for errors
 
@@ -263,7 +258,7 @@ func main() {
 	// mux.HandleFunc("/account", account)
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:8100", "https://tinaco2.tk"},
+		AllowedOrigins:   []string{"http://localhost:8100", "https://tinaco2.tk", "http://localhost:4200"},
 		AllowCredentials: true,
 		// Enable Debugging for testing, consider disabling in production
 		Debug: true,

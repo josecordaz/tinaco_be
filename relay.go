@@ -26,7 +26,9 @@ func main() {
 
 	time.Sleep(time.Second * 5)
 
-	bombPin.Low()
+	for bombPin.Read() == rpio.High {
+		bombPin.Low()
+	}
 	fmt.Println("Low")
 
 	rpio.Close()

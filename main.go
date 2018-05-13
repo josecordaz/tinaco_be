@@ -240,6 +240,7 @@ func main() {
 	echoPin.Input()
 
 	bombPin.Output()
+	bombPin.High()
 
 	// Open and map memory to access gpio, check for errors
 

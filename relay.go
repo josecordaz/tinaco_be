@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// rpio.PullMode(bombPin, rpio.)
-	bombPin.Mode(rpio.Output)
+	bombPin.Mode(rpio.Input)
 	// bombPin.Input()
 	// bombPin.PullOff()
 	// bombPin.low()

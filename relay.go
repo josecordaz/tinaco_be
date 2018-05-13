@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	bombPin = rpio.Pin(27)
+	bombPin = rpio.Pin(17)
 )
 
 func main() {

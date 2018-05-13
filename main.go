@@ -140,7 +140,10 @@ func convertToPCT(d float64) int {
 
 func getlevel(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
-	json.NewEncoder(w).Encode(Level{int(getMeasurement())})
+	d := getDistance()
+
+	pctLevel := convertToPCT(d)
+	json.NewEncoder(w).Encode(Level{pctLevel})
 	// json.NewEncoder(w).Encode(Level{34})
 }
 

@@ -35,19 +35,17 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"sync"
+	"time"
+
+	rpio "github.com/stianeikeland/go-rpio"
 )
 
 var (
 	// Use mcu pin 10, corresponds to physical pin 19 on the pi
 	trigPin = rpio.Pin(23)
 	echoPin = rpio.Pin(24)
-)
-
-import (
-	"sync"
-	"time"
-
-	rpio "github.com/stianeikeland/go-rpio"
 )
 
 func getMeasurement() float64 {
@@ -121,7 +119,7 @@ func convertToPCT(d float64) int {
 	return int(100 - ((rdistance * 100) / total))
 }
 
-func main(){
+func main() {
 	if err := rpio.Open(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -131,10 +129,11 @@ func main(){
 
 	echoPin.Input()
 
-	fmt.Println("Test",int(getMeasurement()))
+	fmt.Println("Test", int(getMeasurement()))
 
 	rpio.Close()
 }
+
 // import (
 // 	"fmt"
 // 	"os"

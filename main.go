@@ -148,11 +148,13 @@ func getlevel(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBombStatus(w http.ResponseWriter, r *http.Request) {
+	validateRequest(w, r)
 	conn := Conn{bomba_state}
 	json.NewEncoder(w).Encode(conn)
 }
 
 func TurnBombOn(w http.ResponseWriter, r *http.Request) {
+	validateRequest(w, r)
 	bombPin.Output()
 	bomba_state = true
 	json.NewEncoder(w).Encode(Conn{true})
@@ -238,6 +240,8 @@ func main() {
 	trigPin.Output()
 
 	echoPin.Input()
+
+	bombPin.Input()
 
 	// Open and map memory to access gpio, check for errors
 

@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	rpio "github.com/stianeikeland/go-rpio"
 )
@@ -20,6 +21,7 @@ func main() {
 
 	bombPin.Output()
 	bombPin.Mode(rpio.Output)
+	fmt.Println("Output")
 
 	// bombPin.High()
 	// // bombPin.Toggle()
@@ -27,11 +29,10 @@ func main() {
 	// bombPin.High()
 	// fmt.Println("High")
 
-	// time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 5)
 
-	bombPin.Low()
-	// bombPin.Input()
-	fmt.Println("Low")
+	bombPin.Input()
+	fmt.Println("Input")
 
 	// for i := 0; bombPin.Read() == rpio.High; i++ {
 	// 	fmt.Println("i", i)

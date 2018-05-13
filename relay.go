@@ -20,7 +20,7 @@ func main() {
 
 	bombPin.Output()
 	// bombPin.PullOff()
-	bombPin.Low()
+	bombPin.High()
 	// bombPin.PullUp()
 	// bombPin.Mode(rpio.)
 	// fmt.Println("Output")

@@ -150,16 +150,13 @@ func GetBombStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func TurnBombOn(w http.ResponseWriter, r *http.Request) {
-	// bombPin.Output()
-	bombPin.Low()
+	bombPin.Output()
 	bomba_state = true
 	json.NewEncoder(w).Encode(Conn{true})
 }
 
 func TurnBombOff(w http.ResponseWriter, r *http.Request) {
-	// bombPin.Output()
-	bombPin.High()
-	// bombPin.Input()
+	bombPin.Input()
 	bomba_state = false
 	json.NewEncoder(w).Encode(Conn{false})
 }

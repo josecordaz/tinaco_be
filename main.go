@@ -239,6 +239,8 @@ func main() {
 
 	echoPin.Input()
 
+	bombPin.Output()
+
 	// Open and map memory to access gpio, check for errors
 
 	// var wg sync.WaitGroup

@@ -18,7 +18,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	bombPin.Output()
+	// bombPin.Output()
+	bombPin.PullDown()
 	// bombPin.Mode(rpio.)
 	// fmt.Println("Output")
 	// bomb

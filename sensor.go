@@ -129,7 +129,7 @@ func main() {
 
 	echoPin.Input()
 
-	fmt.Println("Test", int(getMeasurement()))
+	fmt.Println("Test", int(getDistance()))
 
 	rpio.Close()
 }

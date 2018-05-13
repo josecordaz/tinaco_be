@@ -157,8 +157,8 @@ func TurnBombOn(w http.ResponseWriter, r *http.Request) {
 }
 
 func TurnBombOff(w http.ResponseWriter, r *http.Request) {
-	bombPin.Low()
-	bombPin.Input()
+	// bombPin.Low()
+	// bombPin.Input()
 	bombPin.Output()
 	bombPin.Low()
 	bomba_state = false

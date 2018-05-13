@@ -129,7 +129,11 @@ func main() {
 
 	echoPin.Input()
 
-	fmt.Println("Test", int(getDistance()))
+	d := int(getDistance())
+
+	res := convertToPCT()
+
+	fmt.Println("Test", res)
 
 	rpio.Close()
 }

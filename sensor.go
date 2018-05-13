@@ -131,7 +131,7 @@ func main() {
 
 	d := int(getDistance())
 
-	res := convertToPCT()
+	res := convertToPCT(d)
 
 	fmt.Println("Test", res)
 

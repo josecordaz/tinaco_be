@@ -33,6 +33,108 @@
 
 package main
 
+import (
+	"fmt"
+)
+
+var (
+	// Use mcu pin 10, corresponds to physical pin 19 on the pi
+	trigPin = rpio.Pin(23)
+	echoPin = rpio.Pin(24)
+)
+
+import (
+	"sync"
+	"time"
+
+	rpio "github.com/stianeikeland/go-rpio"
+)
+
+func getMeasurement() float64 {
+
+	trigPin.Low()
+
+	time.Sleep(time.Millisecond * 200)
+
+	trigPin.High()
+
+	time.Sleep(time.Microsecond * 20)
+
+	trigPin.Low()
+
+	var wg sync.WaitGroup
+	var start time.Time
+	var d time.Duration
+
+	wg.Add(1)
+	go func() {
+		for echoPin.Read() == rpio.Low {
+		}
+		start = time.Now()
+		for echoPin.Read() == rpio.High {
+		}
+		d = time.Since(start)
+		wg.Done()
+	}()
+
+	wg.Wait()
+
+	res := d.Seconds() * 17000
+
+	return res
+}
+
+func getDistance() float64 {
+	ds := make([]float64, 0)
+	var avg, sum float64
+	for i := 0; i < 10; i++ {
+		ds = append(ds, getMeasurement())
+		time.Sleep(time.Millisecond * 100)
+	}
+
+	bubbleSort(ds)
+
+	ds = ds[2:7]
+
+	for _, v := range ds {
+		sum += v
+	}
+
+	avg = sum / 5
+
+	return avg
+}
+
+func convertToPCT(d float64) int {
+	low := 20.0
+	hight := 110.0
+
+	if d < low {
+		return 100
+	} else if d > hight {
+		return 0
+	}
+
+	rdistance := d - low
+	total := hight - low
+
+	return int(100 - ((rdistance * 100) / total))
+}
+
+func main(){
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	trigPin.Output()
+
+	echoPin.Input()
+
+	fmt.Println("Test",int(getMeasurement()))
+
+	rpio.Close()
+}
 // import (
 // 	"fmt"
 // 	"os"

@@ -18,8 +18,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	rpio.PullMode(bombPin, rpio.PullUp)
-	// bombPin.Mode(rpio.)
+	// rpio.PullMode(bombPin, rpio.)
+	bombPin.Mode(rpio.Output)
 	// bombPin.Input()
 	// bombPin.PullOff()
 	// bombPin.low()

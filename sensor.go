@@ -148,24 +148,24 @@ func main() {
 // 	echoPin = rpio.Pin(24)
 // )
 
-// func Swap(arrayzor []float64, i, j int) {
-// 	tmp := arrayzor[j]
-// 	arrayzor[j] = arrayzor[i]
-// 	arrayzor[i] = tmp
-// }
+func Swap(arrayzor []float64, i, j int) {
+	tmp := arrayzor[j]
+	arrayzor[j] = arrayzor[i]
+	arrayzor[i] = tmp
+}
 
-// func bubbleSort(arrayzor []float64) {
-// 	swapped := true
-// 	for swapped {
-// 		swapped = false
-// 		for i := 0; i < len(arrayzor)-1; i++ {
-// 			if arrayzor[i+1] < arrayzor[i] {
-// 				Swap(arrayzor, i, i+1)
-// 				swapped = true
-// 			}
-// 		}
-// 	}
-// }
+func bubbleSort(arrayzor []float64) {
+	swapped := true
+	for swapped {
+		swapped = false
+		for i := 0; i < len(arrayzor)-1; i++ {
+			if arrayzor[i+1] < arrayzor[i] {
+				Swap(arrayzor, i, i+1)
+				swapped = true
+			}
+		}
+	}
+}
 
 // func getMeasurement() float64 {
 // 	// GPIO.setup(TRIG,GPIO.OUT)

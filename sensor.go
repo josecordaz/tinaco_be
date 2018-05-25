@@ -120,22 +120,28 @@ func convertToPCT(d float64) int {
 }
 
 func main() {
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+
+	for {
+
+		if err := rpio.Open(); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		trigPin.Output()
+
+		echoPin.Input()
+
+		d := getDistance()
+
+		res := convertToPCT(d)
+
+		fmt.Println("PCT:=", res)
+
+		rpio.Close()
+
+		time.Sleep(time.Second)
 	}
-
-	trigPin.Output()
-
-	echoPin.Input()
-
-	d := getDistance()
-
-	res := convertToPCT(d)
-
-	fmt.Println("Test", res)
-
-	rpio.Close()
 }
 
 // import (

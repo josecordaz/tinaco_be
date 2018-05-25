@@ -134,7 +134,7 @@ func main() {
 
 		echoPin.Input()
 
-		d := getDistance()
+		d := getMeasurement()
 
 		res := convertToPCT(d)
 

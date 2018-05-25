@@ -140,8 +140,12 @@ func convertToPCT(d float64) int {
 
 func getlevel(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	d := getDistance()
-
+	rpio.Close()
 	pctLevel := convertToPCT(d)
 	json.NewEncoder(w).Encode(Level{pctLevel})
 	// json.NewEncoder(w).Encode(Level{34})
@@ -155,13 +159,23 @@ func GetBombStatus(w http.ResponseWriter, r *http.Request) {
 
 func TurnBombOn(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	bombPin.Output()
+	rpio.Close()
 	bomba_state = true
 	json.NewEncoder(w).Encode(Conn{true})
 }
 
 func TurnBombOff(w http.ResponseWriter, r *http.Request) {
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	bombPin.Input()
+	rpio.Close()
 	bomba_state = false
 	json.NewEncoder(w).Encode(Conn{false})
 }
@@ -231,11 +245,6 @@ func main() {
 	// mux.Headers("Access-Control-Allow-Origin", "*")
 
 	// Set pin to output mode
-
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 
 	trigPin.Output()
 

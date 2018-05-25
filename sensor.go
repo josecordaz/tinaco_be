@@ -121,6 +121,8 @@ func convertToPCT(d float64) int {
 
 func main() {
 
+	count := 0
+
 	for {
 
 		if err := rpio.Open(); err != nil {
@@ -136,11 +138,13 @@ func main() {
 
 		res := convertToPCT(d)
 
-		fmt.Println("PCT:=", res)
+		fmt.Println(count, " PCT:=", res)
 
 		rpio.Close()
 
 		time.Sleep(time.Second * 2)
+
+		count++
 	}
 }
 

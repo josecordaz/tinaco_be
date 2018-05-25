@@ -85,20 +85,20 @@ func getMeasurement() float64 {
 func getDistance() float64 {
 	ds := make([]float64, 0)
 	var avg, sum float64
-	for i := 0; i < 10; i++ {
+	for i := 0; i <= 6; i++ {
 		ds = append(ds, getMeasurement())
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 200)
 	}
 
 	bubbleSort(ds)
 
-	ds = ds[2:7]
+	ds = ds[2:4]
 
 	for _, v := range ds {
 		sum += v
 	}
 
-	avg = sum / 5
+	avg = sum / 2
 
 	return avg
 }
@@ -134,7 +134,7 @@ func main() {
 
 		echoPin.Input()
 
-		d := getMeasurement()
+		d := getDistance()
 
 		res := convertToPCT(d)
 

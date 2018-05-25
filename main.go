@@ -29,7 +29,6 @@ type JWTData struct {
 }
 
 var (
-	// Use mcu pin 10, corresponds to physical pin 19 on the pi
 	bombPin = rpio.Pin(15)
 	trigPin = rpio.Pin(23)
 	echoPin = rpio.Pin(24)
@@ -148,7 +147,6 @@ func getlevel(w http.ResponseWriter, r *http.Request) {
 	rpio.Close()
 	pctLevel := convertToPCT(d)
 	json.NewEncoder(w).Encode(Level{pctLevel})
-	// json.NewEncoder(w).Encode(Level{34})
 }
 
 func GetBombStatus(w http.ResponseWriter, r *http.Request) {
@@ -170,6 +168,7 @@ func TurnBombOn(w http.ResponseWriter, r *http.Request) {
 }
 
 func TurnBombOff(w http.ResponseWriter, r *http.Request) {
+	validateRequest(w, r)
 	if err := rpio.Open(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -181,11 +180,6 @@ func TurnBombOff(w http.ResponseWriter, r *http.Request) {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println("Header", r.Header)
-	fmt.Println("Host", r.Host)
-	fmt.Println("PostForm", r.PostForm)
-	fmt.Println("RemoteAddr", r.RemoteAddr)
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -241,8 +235,6 @@ func main() {
 	mux.HandleFunc("/b_on", TurnBombOn)
 	mux.HandleFunc("/b_off", TurnBombOff)
 	mux.HandleFunc("/b_status", GetBombStatus)
-	// mux.Headers("", "")
-	// mux.Headers("Access-Control-Allow-Origin", "*")
 
 	// Set pin to output mode
 	if err := rpio.Open(); err != nil {
@@ -258,56 +250,18 @@ func main() {
 
 	rpio.Close()
 
-	// Open and map memory to access gpio, check for errors
-
-	// var wg sync.WaitGroup
-
-	// wg.Add(1)
-	// go func() {
-	// 	defer wg.Done()
-	// 	for {
-
-	// 		d := getDistance()
-	// 		level.mu.Lock()
-	// 		level.Level = convertToPCT(d)
-	// 		level.mu.Unlock()
-	// 		fmt.Println(time.Now().Format(time.RFC3339), " level Readed ", level)
-	// 		time.Sleep(time.Second)
-	// 	}
-	// }()
-
 	fmt.Println("Server ready!!")
-	// err := http.ListenAndServeTLS("0.0.0.0:443", "certificate.crt", "private.key", handlers.CORS()(router))
-	// err := http.ListenAndServe("0.0.0.0:8082", handlers.CORS()(router))
-	// if err != nil {
-	// 	fmt.Println("Error", err)
-	// }
-
-	// mux.HandleFunc("/", hello)
-	// mux.HandleFunc("/login", login)
-	// mux.HandleFunc("/account", account)
-
-	// "http://localhost:8100", "https://tinaco2.tk", "http://localhost:4200", "http://192.168.1.65", "http://192.168.0.14"
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
-		// AllowedHeaders:   []string{"Access-Control-Allow-Origin", "Authorization", "Cache-Control", "Content-Type"},
-		// Enable Debugging for testing, consider disabling in production
-		Debug: true,
+		Debug:            false,
 	})
 
-	// Insert the middleware
 	handler := c.Handler(mux)
 
-	// handler := cors.Default().Handler(mux)
-
-	log.Println("Listening for connections on port: ", 8082)
+	log.Println("Listening for connections on port: ", 443)
 	log.Fatal(http.ListenAndServeTLS("0.0.0.0:443", "certificate.crt", "private.key", handler))
-
-	// wg.Wait()
-
-	// rpio.Close()
 
 }
 

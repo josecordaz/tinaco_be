@@ -140,7 +140,7 @@ func main() {
 
 		rpio.Close()
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 2)
 	}
 }
 

@@ -30,7 +30,7 @@ type JWTData struct {
 
 var (
 	// Use mcu pin 10, corresponds to physical pin 19 on the pi
-	bombPin = rpio.Pin(17)
+	bombPin = rpio.Pin(15)
 	trigPin = rpio.Pin(23)
 	echoPin = rpio.Pin(24)
 )

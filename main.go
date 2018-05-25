@@ -245,12 +245,18 @@ func main() {
 	// mux.Headers("Access-Control-Allow-Origin", "*")
 
 	// Set pin to output mode
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	trigPin.Output()
 
 	echoPin.Input()
 
 	bombPin.Input()
+
+	rpio.Close()
 
 	// Open and map memory to access gpio, check for errors
 

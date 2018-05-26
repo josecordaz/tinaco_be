@@ -270,12 +270,12 @@ func main() {
 					os.Exit(1)
 				}
 				d := getMeasurement()
-				rpio.Close()
 				pctLevel := convertToPCT(d)
 				if pctLevel == 100 {
 					bombPin.Input()
 					bomba_state = false
 				}
+				rpio.Close()
 			} else {
 				fmt.Printf("%s", "OFF\n")
 			}

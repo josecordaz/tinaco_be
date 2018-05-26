@@ -145,11 +145,11 @@ func getlevel(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(1)
 	d := getDistance()
-	fmt.Println(2)
+	fmt.Println("d", d)
 	rpio.Close()
 	fmt.Println(3)
 	pctLevel := convertToPCT(d)
-	fmt.Println(4)
+	fmt.Println("pctLevel", pctLevel)
 	json.NewEncoder(w).Encode(Level{pctLevel})
 	fmt.Println(5)
 }

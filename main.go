@@ -97,7 +97,7 @@ func getMeasurement() float64 {
 
 	res := d.Seconds() * 17000
 
-	console.log("res", res)
+	fmt.Println("res", res)
 
 	return res
 }

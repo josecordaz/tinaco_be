@@ -143,10 +143,15 @@ func getlevel(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	fmt.Println(1)
 	d := getDistance()
+	fmt.Println(2)
 	rpio.Close()
+	fmt.Println(3)
 	pctLevel := convertToPCT(d)
+	fmt.Println(4)
 	json.NewEncoder(w).Encode(Level{pctLevel})
+	fmt.Println(5)
 }
 
 func GetBombStatus(w http.ResponseWriter, r *http.Request) {

@@ -262,9 +262,9 @@ func main() {
 
 	go func() {
 		for {
-			fmt.Fprint("%s", "Checkinkg bomb status ... ")
+			fmt.Printf("%s", "Checkinkg bomb status ... ")
 			if bomba_state {
-				fmt.Fprint("%s", "ON\n")
+				fmt.Printf("%s", "ON\n")
 				if err := rpio.Open(); err != nil {
 					fmt.Println(err)
 					os.Exit(1)
@@ -277,7 +277,7 @@ func main() {
 					bomba_state = false
 				}
 			} else {
-				fmt.Fprint("%s", "OFF\n")
+				fmt.Printf("%s", "OFF\n")
 			}
 			time.Sleep(time.Second * 5)
 		}

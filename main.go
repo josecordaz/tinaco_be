@@ -260,6 +260,25 @@ func main() {
 
 	handler := c.Handler(mux)
 
+	go func() {
+		for {
+			fmt.Fprint("Checkinkg bomb status ... ")
+			if bomba_state {
+				fmt.Fprint("ON\n")
+				if err := rpio.Open(); err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+				bombPin.Input()
+				rpio.Close()
+				bomba_state = false
+			} else {
+				fmt.Fprint("OFF\n")
+			}
+			time.Sleep(time.Second * 5)
+		}
+	}()
+
 	log.Println("Listening for connections on port: ", 443)
 	log.Fatal(http.ListenAndServeTLS("0.0.0.0:443", "certificate.crt", "private.key", handler))
 

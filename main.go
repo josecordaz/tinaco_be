@@ -29,7 +29,7 @@ type JWTData struct {
 }
 
 var (
-	echoPin = rpio.Pin(24)
+	bombPin = rpio.Pin(15)
 )
 
 type pins struct {

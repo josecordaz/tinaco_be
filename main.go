@@ -29,10 +29,14 @@ type JWTData struct {
 }
 
 var (
-	bombPin = rpio.Pin(15)
-	trigPin = rpio.Pin(23)
 	echoPin = rpio.Pin(24)
 )
+
+type pins struct {
+	trigPin rpio.Pin
+	echoPin rpio.Pin
+	mux     sync.Mutex
+}
 
 var bomba_state = false
 
@@ -68,15 +72,15 @@ func bubbleSort(arrayzor []float64) {
 
 func getMeasurement() float64 {
 
-	trigPin.Low()
+	pinsObj.trigPin.Low()
 
 	time.Sleep(time.Millisecond * 200)
 
-	trigPin.High()
+	pinsObj.trigPin.High()
 
 	time.Sleep(time.Microsecond * 20)
 
-	trigPin.Low()
+	pinsObj.trigPin.Low()
 
 	var wg sync.WaitGroup
 	var start time.Time
@@ -84,10 +88,10 @@ func getMeasurement() float64 {
 
 	wg.Add(1)
 	go func() {
-		for echoPin.Read() == rpio.Low {
+		for pinsObj.echoPin.Read() == rpio.Low {
 		}
 		start = time.Now()
-		for echoPin.Read() == rpio.High {
+		for pinsObj.echoPin.Read() == rpio.High {
 		}
 		d = time.Since(start)
 		wg.Done()
@@ -141,14 +145,16 @@ func convertToPCT(d float64) int {
 
 func getlevel(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	// if err := rpio.Open(); err != nil {
+	// 	fmt.Println(err)
+	// 	os.Exit(1)
+	// }
 	fmt.Println(1)
+	pinsObj.mux.Lock()
 	d := getDistance()
+	pinsObj.mux.Unlock()
 	fmt.Println("d", d)
-	rpio.Close()
+	// rpio.Close()
 	fmt.Println(3)
 	pctLevel := convertToPCT(d)
 	fmt.Println("pctLevel", pctLevel)
@@ -164,24 +170,24 @@ func GetBombStatus(w http.ResponseWriter, r *http.Request) {
 
 func TurnBombOn(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	// if err := rpio.Open(); err != nil {
+	// 	fmt.Println(err)
+	// 	os.Exit(1)
+	// }
 	bombPin.Output()
-	rpio.Close()
+	// rpio.Close()
 	bomba_state = true
 	json.NewEncoder(w).Encode(Conn{true})
 }
 
 func TurnBombOff(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	// if err := rpio.Open(); err != nil {
+	// 	fmt.Println(err)
+	// 	os.Exit(1)
+	// }
 	bombPin.Input()
-	rpio.Close()
+	// rpio.Close()
 	bomba_state = false
 	json.NewEncoder(w).Encode(Conn{false})
 }
@@ -234,6 +240,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var pinsObj = pins{
+	trigPin: rpio.Pin(23),
+	echoPin: rpio.Pin(24),
+}
+
 // main function to boot up everything
 func main() {
 	mux := http.NewServeMux()
@@ -249,13 +260,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	trigPin.Output()
+	pinsObj.trigPin.Output()
 
-	echoPin.Input()
+	pinsObj.echoPin.Input()
 
 	bombPin.Input()
 
-	rpio.Close()
+	defer rpio.Close()
 
 	fmt.Println("Server ready!!")
 
@@ -272,17 +283,19 @@ func main() {
 			fmt.Printf("%s", "Checkinkg bomb status ... ")
 			if bomba_state {
 				fmt.Printf("%s", "ON\n")
-				if err := rpio.Open(); err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
+				// if err := rpio.Open(); err != nil {
+				// 	fmt.Println(err)
+				// 	os.Exit(1)
+				// }
+				pinsObj.mux.Lock()
 				d := getMeasurement()
+				pinsObj.mux.Unlock()
 				pctLevel := convertToPCT(d)
 				if pctLevel == 100 {
 					bombPin.Input()
 					bomba_state = false
 				}
-				rpio.Close()
+				// rpio.Close()
 			} else {
 				fmt.Printf("%s", "OFF\n")
 			}

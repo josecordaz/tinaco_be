@@ -17,6 +17,25 @@ import (
 	rpio "github.com/stianeikeland/go-rpio"
 )
 
+type syncAcess struct {
+	mux sync.Mutex
+}
+
+var instance *syncAcess
+
+func (s *syncAcess) Start() {
+	s.mux.Lock()
+	if err := rpio.Open(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func (s *syncAcess) Done() {
+	rpio.Close()
+	s.mux.Unlock()
+}
+
 const (
 	SECRET = "42isTheAnswer"
 )
@@ -29,14 +48,10 @@ type JWTData struct {
 }
 
 var (
+	trigPin = rpio.Pin(23)
+	echoPin = rpio.Pin(24)
 	bombPin = rpio.Pin(15)
 )
-
-type pins struct {
-	trigPin rpio.Pin
-	echoPin rpio.Pin
-	mux     sync.Mutex
-}
 
 var bomba_state = false
 
@@ -72,15 +87,15 @@ func bubbleSort(arrayzor []float64) {
 
 func getMeasurement() float64 {
 
-	pinsObj.trigPin.Low()
+	trigPin.Low()
 
 	time.Sleep(time.Millisecond * 200)
 
-	pinsObj.trigPin.High()
+	trigPin.High()
 
 	time.Sleep(time.Microsecond * 20)
 
-	pinsObj.trigPin.Low()
+	trigPin.Low()
 
 	var wg sync.WaitGroup
 	var start time.Time
@@ -88,10 +103,10 @@ func getMeasurement() float64 {
 
 	wg.Add(1)
 	go func() {
-		for pinsObj.echoPin.Read() == rpio.Low {
+		for echoPin.Read() == rpio.Low {
 		}
 		start = time.Now()
-		for pinsObj.echoPin.Read() == rpio.High {
+		for echoPin.Read() == rpio.High {
 		}
 		d = time.Since(start)
 		wg.Done()
@@ -101,7 +116,7 @@ func getMeasurement() float64 {
 
 	res := d.Seconds() * 17000
 
-	fmt.Println("res", res)
+	fmt.Println("getMeasurement ", res)
 
 	return res
 }
@@ -145,21 +160,12 @@ func convertToPCT(d float64) int {
 
 func getlevel(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
-	// if err := rpio.Open(); err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
-	fmt.Println(1)
-	pinsObj.mux.Lock()
+	instance.Start()
 	d := getDistance()
-	pinsObj.mux.Unlock()
-	fmt.Println("d", d)
-	// rpio.Close()
-	fmt.Println(3)
+	instance.Done()
 	pctLevel := convertToPCT(d)
 	fmt.Println("pctLevel", pctLevel)
 	json.NewEncoder(w).Encode(Level{pctLevel})
-	fmt.Println(5)
 }
 
 func GetBombStatus(w http.ResponseWriter, r *http.Request) {
@@ -170,24 +176,18 @@ func GetBombStatus(w http.ResponseWriter, r *http.Request) {
 
 func TurnBombOn(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
-	// if err := rpio.Open(); err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
+	instance.Start()
 	bombPin.Output()
-	// rpio.Close()
+	instance.Done()
 	bomba_state = true
 	json.NewEncoder(w).Encode(Conn{true})
 }
 
 func TurnBombOff(w http.ResponseWriter, r *http.Request) {
 	validateRequest(w, r)
-	// if err := rpio.Open(); err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
+	instance.Start()
 	bombPin.Input()
-	// rpio.Close()
+	instance.Done()
 	bomba_state = false
 	json.NewEncoder(w).Encode(Conn{false})
 }
@@ -240,13 +240,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var pinsObj = pins{
-	trigPin: rpio.Pin(23),
-	echoPin: rpio.Pin(24),
-}
-
 // main function to boot up everything
 func main() {
+
+	instance = new(syncAcess)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/login", login)
 	mux.HandleFunc("/level", getlevel)
@@ -255,18 +253,13 @@ func main() {
 	mux.HandleFunc("/b_status", GetBombStatus)
 
 	// Set pin to output mode
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	instance.Start()
 
-	pinsObj.trigPin.Output()
-
-	pinsObj.echoPin.Input()
-
+	trigPin.Output()
+	echoPin.Input()
 	bombPin.Input()
 
-	defer rpio.Close()
+	instance.Done()
 
 	fmt.Println("Server ready!!")
 
@@ -287,9 +280,9 @@ func main() {
 				// 	fmt.Println(err)
 				// 	os.Exit(1)
 				// }
-				pinsObj.mux.Lock()
+				instance.Start()
 				d := getMeasurement()
-				pinsObj.mux.Unlock()
+				instance.Done()
 				pctLevel := convertToPCT(d)
 				if pctLevel == 100 {
 					bombPin.Input()

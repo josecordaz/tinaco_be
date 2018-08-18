@@ -24,7 +24,22 @@ def hello():
 
 @app.route("/level")
 def level():
-    return str(getMeasure())
+    dt = {
+        "level":getMeasure()
+    }
+    return json.dumps(dt)
+
+@app.route("/b_on")
+def level():
+    return "encender bomba"
+
+@app.route("/b_off")
+def level():
+    return "apagar bomba"
+
+@app.route("/b_status")
+def level():
+    return "bomba estatus"
 
 # mux.HandleFunc("/login", login)
 # mux.HandleFunc("/level", getlevel)

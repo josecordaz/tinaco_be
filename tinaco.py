@@ -25,7 +25,7 @@ def hello():
 @app.route("/level")
 def level():
     dt = {
-        "level":getMeasure()
+        "level":str(getMeasure())
     }
     return json.dumps(dt)
 

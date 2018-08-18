@@ -2,6 +2,7 @@ from flask import Flask
 import RPi.GPIO as GPIO
 import time
 import random
+import json
 
 GPIO.setmode(GPIO.BCM)
 
@@ -10,10 +11,26 @@ ECHO = 24
 
 app = Flask(__name__)
 
+data = {
+    "president": {
+        "name": "Zaphod Beeblebrox",
+        "species": "Betelgeusian"
+    }
+}
+
 @app.route("/")
 def hello():
+    return json.dumps(data)
+
+@app.route("/level")
+def level():
     return str(getMeasure())
 
+# mux.HandleFunc("/login", login)
+# mux.HandleFunc("/level", getlevel)
+# mux.HandleFunc("/b_on", TurnBombOn)
+# mux.HandleFunc("/b_off", TurnBombOff)
+# mux.HandleFunc("/b_status", GetBombStatus)
 
 def getMeasure():
     return random.random() * 100

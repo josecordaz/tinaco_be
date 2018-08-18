@@ -1,6 +1,7 @@
 from flask import Flask
 import RPi.GPIO as GPIO
 import time
+import random
 
 GPIO.setmode(GPIO.BCM)
 

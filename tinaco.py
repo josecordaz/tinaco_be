@@ -15,36 +15,37 @@ def hello():
 
 
 def getMeasure():
-    print "Distance Measurement In Progress"
+    return random.random() * 100
+    # print "Distance Measurement In Progress"
 
-    GPIO.setup(TRIG,GPIO.OUT)
-    GPIO.output(TRIG,0)
+    # GPIO.setup(TRIG,GPIO.OUT)
+    # GPIO.output(TRIG,0)
 
-    GPIO.setup(ECHO,GPIO.IN)
+    # GPIO.setup(ECHO,GPIO.IN)
 
-    time.sleep(0.1)
+    # time.sleep(0.1)
 
-    print "Stargin measurement"
+    # print "Stargin measurement"
 
-    GPIO.output(TRIG, 1)
-    time.sleep(0.00001)
-    GPIO.output(TRIG, 0)
+    # GPIO.output(TRIG, 1)
+    # time.sleep(0.00001)
+    # GPIO.output(TRIG, 0)
 
-    while GPIO.input(ECHO) == 0:
-        pass
-    start = time.time()
+    # while GPIO.input(ECHO) == 0:
+    #     pass
+    # start = time.time()
 
-    while GPIO.input(ECHO) == 1:
-        pass
-    stop = time.time()
+    # while GPIO.input(ECHO) == 1:
+    #     pass
+    # stop = time.time()
 
-    print (stop - start)
+    # print (stop - start)
 
-    print (stop - start) * 17000
+    # print (stop - start) * 17000
 
-    GPIO.cleanup()
+    # GPIO.cleanup()
 
-    return (stop - start) * 17000
+    # return (stop - start) * 17000
 
 if __name__ == '__main__':
     app.run(host= '0.0.0.0',debug=True)

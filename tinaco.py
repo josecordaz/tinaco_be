@@ -1,13 +1,13 @@
 from flask import Flask
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 import time
 import random
 import json
 
-GPIO.setmode(GPIO.BCM)
+# GPIO.setmode(GPIO.BCM)
 
-TRIG = 23
-ECHO = 24
+# TRIG = 23
+# ECHO = 24
 
 app = Flask(__name__)
 
@@ -30,15 +30,15 @@ def level():
     return json.dumps(dt)
 
 @app.route("/b_on")
-def level():
+def b_on():
     return "encender bomba"
 
 @app.route("/b_off")
-def level():
+def b_off():
     return "apagar bomba"
 
 @app.route("/b_status")
-def level():
+def b_status():
     return "bomba estatus"
 
 # mux.HandleFunc("/login", login)
